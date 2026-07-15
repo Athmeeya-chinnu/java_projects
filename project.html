@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ExamForge MCQ System</title>
+
+<style>
+
+/* BODY */
+
+body{
+
+    margin:0;
+    padding:0;
+
+    font-family:Arial,sans-serif;
+
+    background:
+    linear-gradient(
+        rgba(0,0,0,0.5),
+        rgba(0,0,0,0.5)
+    ),
+    url("https://images.unsplash.com/photo-1522202176988-66273c2fd55f");
+
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* CONTAINER */
+
+.container{
+
+    width:85%;
+    max-width:1200px;
+
+    background:rgba(255,255,255,0.96);
+
+    padding:35px;
+
+    border-radius:25px;
+
+    box-shadow:0px 0px 25px rgba(0,0,0,0.5);
+}
+
+/* HEADING */
+
+h1{
+
+    text-align:center;
+
+    color:darkblue;
+
+    font-size:42px;
+}
+
+/* INPUT */
+
+input{
+
+    width:100%;
+
+    padding:15px;
+
+    margin-bottom:20px;
+
+    border-radius:10px;
+
+    border:2px solid blue;
+
+    font-size:17px;
+
+    box-sizing:border-box;
+}
+
+/* BUTTON */
+
+button{
+
+    padding:15px 25px;
+
+    background:blue;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    margin-top:10px;
+    margin-right:10px;
+
+    transition:0.3s;
+}
+
+button:hover{
+
+    background:darkblue;
+
+    transform:scale(1.03);
+}
+
+/* TIMER */
+
+#timer{
+
+    text-align:center;
+
+    color:red;
+
+    font-size:32px;
+
+    font-weight:bold;
+
+    margin-bottom:20px;
+}
+
+/* QUESTION BOX */
+
+.question-box{
+
+    background:#f5f9ff;
+
+    padding:20px;
+
+    margin-bottom:20px;
+
+    border-left:8px solid blue;
+
+    border-radius:15px;
+
+    box-shadow:0px 0px 10px lightgray;
+}
+
+.question-box h3{
+
+    color:#003366;
+}
+
+/* OPTIONS */
+
+label{
+
+    display:block;
+
+    background:white;
+
+    padding:10px;
+
+    margin-top:10px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+}
+
+label:hover{
+
+    background:#dbefff;
+}
+
+/* RESULT */
+
+#result{
+
+    margin-top:20px;
+
+    font-size:28px;
+
+    font-weight:bold;
+
+    color:darkgreen;
+}
+
+/* ANSWER COLORS */
+
+.correct{
+
+    color:green;
+    font-weight:bold;
+}
+
+.wrong{
+
+    color:red;
+    font-weight:bold;
+}
+
+/* HIDE PAGES */
+
+#loginPage,
+#quizPage{
+
+    display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- REGISTER PAGE -->
+
+<div class="container" id="registerPage">
+
+    <h1>Student Registration</h1>
+
+    <input type="text"
+           id="regName"
+           placeholder="Enter Student Name">
+
+    <input type="email"
+           id="regEmail"
+           placeholder="Enter Email ID">
+
+    <input type="password"
+           id="regPassword"
+           placeholder="Enter Password">
+
+    <button onclick="registerStudent()">
+
+        Register
+
+    </button>
+
+</div>
+
+<!-- LOGIN PAGE -->
+
+<div class="container" id="loginPage">
+
+    <h1>Student Login</h1>
+
+    <input type="text"
+           id="loginName"
+           placeholder="Enter Student Name">
+
+    <input type="email"
+           id="loginEmail"
+           placeholder="Enter Email ID">
+
+    <input type="password"
+           id="loginPassword"
+           placeholder="Enter Password">
+
+    <button onclick="loginStudent()">
+
+        Login
+
+    </button>
+
+</div>
+
+<!-- QUIZ PAGE -->
+
+<div class="container" id="quizPage">
+
+    <h1>ExamForge MCQ Test</h1>
+
+    <div id="timer">
+
+        15:00
+
+    </div>
+
+    <div id="quiz"></div>
+
+    <button onclick="submitExam()">
+
+        Submit Exam
+
+    </button>
+
+    <button onclick="saveExam()">
+
+        Save Exam
+
+    </button>
+
+    <button onclick="logout()">
+
+        Logout
+
+    </button>
+
+    <button onclick="exitPage()">
+
+        Exit
+
+    </button>
+
+    <div id="result"></div>
+
+</div>
+
+<script>
+
+/* STORE USERS */
+
+let users = [];
+
+/* STUDENTS WHO COMPLETED EXAM */
+
+let completedStudents = [];
+
+/* REGISTER */
+
+function registerStudent(){
+
+    let name =
+    document.getElementById("regName").value;
+
+    let email =
+    document.getElementById("regEmail").value;
+
+    let password =
+    document.getElementById("regPassword").value;
+
+    if(name === "" || email === "" || password === ""){
+
+        alert("Please Fill All Fields");
+
+        return;
+    }
+
+    /* DUPLICATE NAME CHECK */
+
+    let existingUser = users.find(user =>
+        user.name === name
+    );
+
+    if(existingUser){
+
+        alert("Student Name Already Exists");
+
+        return;
+    }
+
+    users.push({
+
+        name:name,
+        email:email,
+        password:password
+    });
+
+    alert("Registration Successful");
+
+    document.getElementById("registerPage").style.display = "none";
+
+    document.getElementById("loginPage").style.display = "block";
+}
+
+/* LOGIN */
+
+function loginStudent(){
+
+    let name =
+    document.getElementById("loginName").value;
+
+    let email =
+    document.getElementById("loginEmail").value;
+
+    let password =
+    document.getElementById("loginPassword").value;
+
+    let validUser = users.find(user =>
+
+        user.name === name &&
+        user.email === email &&
+        user.password === password
+    );
+
+    if(!validUser){
+
+        alert("Invalid Credentials");
+
+        return;
+    }
+
+    /* CHECK STUDENT ALREADY ATTENDED */
+
+    if(completedStudents.includes(name)){
+
+        alert("Student Already Attended Exam");
+
+        return;
+    }
+
+    document.getElementById("loginPage").style.display = "none";
+
+    document.getElementById("quizPage").style.display = "block";
+
+    loadQuestions();
+
+    startTimer();
+}
+
+/* QUESTIONS */
+
+let questions = [
+
+{
+question:"Capital of India?",
+options:["Delhi","Mumbai","Chennai","Kolkata"],
+answer:"Delhi"
+},
+
+{
+question:"Largest planet?",
+options:["Jupiter","Mars","Earth","Saturn"],
+answer:"Jupiter"
+},
+
+{
+question:"HTML stands for?",
+options:["Hyper Text Markup Language","High Text","Hyperlinks Text","Home Tool"],
+answer:"Hyper Text Markup Language"
+},
+
+{
+question:"Which is programming language?",
+options:["Python","HTML","CSS","Photoshop"],
+answer:"Python"
+},
+
+{
+question:"Who invented Python?",
+options:["Guido van Rossum","Bill Gates","Dennis Ritchie","James Gosling"],
+answer:"Guido van Rossum"
+},
+
+{
+question:"2 + 5 = ?",
+options:["7","6","8","5"],
+answer:"7"
+},
+
+{
+question:"National bird of India?",
+options:["Peacock","Crow","Parrot","Eagle"],
+answer:"Peacock"
+},
+
+{
+question:"Plants use which gas?",
+options:["Carbon Dioxide","Oxygen","Helium","Nitrogen"],
+answer:"Carbon Dioxide"
+},
+
+{
+question:"Sun rises in?",
+options:["East","West","North","South"],
+answer:"East"
+},
+
+{
+question:"Computer brain?",
+options:["CPU","Monitor","Mouse","Keyboard"],
+answer:"CPU"
+},
+
+{
+question:"Browser example?",
+options:["Chrome","Excel","CPU","Windows"],
+answer:"Chrome"
+},
+
+{
+question:"1 KB = ? Bytes",
+options:["1024","512","1000","256"],
+answer:"1024"
+},
+
+{
+question:"India independence year?",
+options:["1947","1950","1945","1960"],
+answer:"1947"
+},
+
+{
+question:"H2O is?",
+options:["Water","Salt","Oxygen","Hydrogen"],
+answer:"Water"
+},
+
+{
+question:"Tallest mountain?",
+options:["Everest","K2","Alps","Aravali"],
+answer:"Everest"
+},
+
+{
+question:"Festival of colors?",
+options:["Holi","Eid","Christmas","Diwali"],
+answer:"Holi"
+},
+
+{
+question:"Android developed by?",
+options:["Google","Apple","IBM","Microsoft"],
+answer:"Google"
+},
+
+{
+question:"Search engine?",
+options:["Google","Python","Chrome","CPU"],
+answer:"Google"
+},
+
+{
+question:"Nearest planet to Sun?",
+options:["Mercury","Earth","Mars","Venus"],
+answer:"Mercury"
+},
+
+{
+question:"Input device?",
+options:["Keyboard","Monitor","Printer","Speaker"],
+answer:"Keyboard"
+},
+
+{
+question:"Output device?",
+options:["Monitor","Mouse","Keyboard","Scanner"],
+answer:"Monitor"
+},
+
+{
+question:"National flower of India?",
+options:["Lotus","Rose","Lily","Sunflower"],
+answer:"Lotus"
+},
+
+{
+question:"Fastest land animal?",
+options:["Cheetah","Tiger","Lion","Horse"],
+answer:"Cheetah"
+},
+
+{
+question:"Heart pumps?",
+options:["Blood","Water","Food","Oxygen"],
+answer:"Blood"
+},
+
+{
+question:"Which is operating system?",
+options:["Windows","HTML","CSS","Python"],
+answer:"Windows"
+}
+
+];
+
+/* SHUFFLE QUESTIONS */
+
+questions.sort(() => Math.random() - 0.5);
+
+/* SHUFFLE OPTIONS */
+
+questions.forEach(q => {
+
+    q.options.sort(() => Math.random() - 0.5);
+
+});
+
+/* LOAD QUESTIONS */
+
+function loadQuestions(){
+
+    let quiz =
+    document.getElementById("quiz");
+
+    quiz.innerHTML = "";
+
+    questions.forEach((q,index)=>{
+
+        let html = `
+
+        <div class="question-box">
+
+        <h3>${index+1}. ${q.question}</h3>
+
+        ${q.options.map(option => `
+
+        <label>
+
+        <input type="radio"
+               name="q${index}"
+               value="${option}">
+
+        ${option}
+
+        </label>
+
+        `).join("")}
+
+        <p id="answer${index}"></p>
+
+        </div>
+
+        `;
+
+        quiz.innerHTML += html;
+    });
+}
+
+/* TIMER */
+
+let timeLeft = 900;
+
+let timerInterval;
+
+function startTimer(){
+
+    timerInterval = setInterval(()=>{
+
+        let minutes =
+        Math.floor(timeLeft / 60);
+
+        let seconds =
+        timeLeft % 60;
+
+        document.getElementById("timer").innerHTML =
+
+        minutes + ":" +
+        (seconds < 10 ? "0" : "") + seconds;
+
+        timeLeft--;
+
+        if(timeLeft < 0){
+
+            clearInterval(timerInterval);
+
+            alert("Time Up! Exam Auto Submitted");
+
+            submitExam();
+        }
+
+    },1000);
+}
+
+/* TAB CHANGE DETECTION */
+
+document.addEventListener("visibilitychange", function(){
+
+    if(document.hidden &&
+       document.getElementById("quizPage").style.display === "block"){
+
+        alert("Another Tab Opened! Exam Auto Submitted");
+
+        submitExam();
+    }
+});
+
+/* SUBMIT */
+
+function submitExam(){
+
+    clearInterval(timerInterval);
+
+    let score = 0;
+
+    questions.forEach((q,index)=>{
+
+        let selected =
+        document.querySelector(`input[name=q${index}]:checked`);
+
+        let answerBox =
+        document.getElementById(`answer${index}`);
+
+        if(selected){
+
+            if(selected.value === q.answer){
+
+                score++;
+
+                answerBox.innerHTML =
+                "✔ Correct Answer";
+
+                answerBox.className = "correct";
+            }
+
+            else{
+
+                answerBox.innerHTML =
+                "✘ Wrong! Correct Answer: " + q.answer;
+
+                answerBox.className = "wrong";
+            }
+        }
+
+        else{
+
+            answerBox.innerHTML =
+            "✘ Not Answered! Correct Answer: " + q.answer;
+
+            answerBox.className = "wrong";
+        }
+    });
+
+    /* SAVE COMPLETED STUDENT */
+
+    let studentName =
+    document.getElementById("loginName").value;
+
+    if(!completedStudents.includes(studentName)){
+
+        completedStudents.push(studentName);
+    }
+
+    document.getElementById("result").innerHTML =
+
+    "Exam Completed Successfully <br>Your Score: "
+    + score + "/25";
+}
+
+/* SAVE */
+
+function saveExam(){
+
+    alert("Exam Saved Successfully");
+}
+
+/* LOGOUT */
+
+function logout(){
+
+    location.reload();
+}
+
+/* EXIT */
+
+function exitPage(){
+
+    window.close();
+}
+
+</script>
+
+</body>
+</html>
